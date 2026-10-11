@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""يعدّل مشروع android المُولَّد بواسطة `flutter create` ليناسب الاعتماديات:
-- تفعيل core library desugaring (مطلوب لـ flutter_local_notifications).
-يعمل مع Gradle بصيغة Kotlin (.kts) أو Groovy. يفشل بوضوح إن لم يجد الأنماط المتوقعة."""
+"""يفعّل core library desugaring في مشروع android المُولَّد. توحيد JVM 17 يتم عبر tool/gradle-jvm17.init.gradle."""
 import pathlib
 import re
 import sys
@@ -32,4 +30,5 @@ else:
     sys.exit("patch_gradle: لم يُعثر على android/app/build.gradle(.kts) — شغّل tool/setup_android.sh أولًا")
 
 f.write_text(s, encoding="utf8")
-print(f"patched {f}")
+
+print(f"patched {f} (desugaring)")

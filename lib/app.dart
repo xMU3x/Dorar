@@ -57,6 +57,8 @@ class WerdApp extends StatefulWidget {
 }
 
 class _WerdAppState extends State<WerdApp> with WidgetsBindingObserver {
+  late final Stream<String> _settings = store.changes.where((k) => k == 'settings').asBroadcastStream();
+
   @override
   void initState() {
     super.initState();
@@ -79,8 +81,8 @@ class _WerdAppState extends State<WerdApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StreamBuilder<String>(
+      stream: _settings,
       builder: (context, _) {
         final dark = isDark(context, modeSetting());
         final pal = Pal.make(dark, palSetting());
@@ -110,6 +112,15 @@ class _WerdAppState extends State<WerdApp> with WidgetsBindingObserver {
   }
 }
 
+/// تبويب واحد فقط يُبنى في كل مرة (أخف بكثير من بناء كل التبويبات وإبقائها حيّة).
+Widget _tabPage(int i) => switch (i) {
+      0 => const HomePage(),
+      1 => const RecitersPage(),
+      2 => const AzkarPage(),
+      3 => const FastingPage(),
+      _ => const MorePage(),
+    };
+
 class NavShell extends StatelessWidget {
   const NavShell({super.key});
   static const _tabs = [
@@ -128,7 +139,10 @@ class NavShell extends StatelessWidget {
       extendBody: true,
       body: ValueListenableBuilder<int>(
         valueListenable: tabIndex,
-        builder: (_, i, __) => IndexedStack(index: i, children: const [HomePage(), RecitersPage(), AzkarPage(), FastingPage(), MorePage()]),
+        builder: (_, i, __) => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: KeyedSubtree(key: ValueKey(i), child: _tabPage(i)),
+        ),
       ),
       bottomNavigationBar: Column(mainAxisSize: MainAxisSize.min, children: [
         ListenableBuilder(listenable: player, builder: (_, __) => player.cur == null ? const SizedBox.shrink() : const MiniPlayer()),

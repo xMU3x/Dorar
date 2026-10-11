@@ -1,13 +1,20 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/services.dart' show rootBundle;
 import 'store.dart';
 import 'util.dart';
 
 /// بيانات القرآن والأذكار والتحديات من ملفات المشروع الأصلية (assets/data).
+Map<String, dynamic> _decode(String s) => jsonDecode(s) as Map<String, dynamic>;
+
 class Data {
   Map<String, dynamic>? _azkar, _quran, _chal;
 
-  Future<Map<String, dynamic>> _load(String n) async => jsonDecode(await rootBundle.loadString('assets/data/$n.json')) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> _load(String n) async {
+    final raw = await rootBundle.loadString('assets/data/$n.json');
+    // ملفات كبيرة (القرآن ≈ 1.5MB): فك الترميز في isolate حتى لا تتجمّد الواجهة
+    return compute(_decode, raw);
+  }
 
   Future<List<Map<String, dynamic>>> categories() async {
     _azkar ??= await _load('azkar');

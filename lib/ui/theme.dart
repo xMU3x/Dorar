@@ -26,7 +26,7 @@ class Pal extends ThemeExtension<Pal> {
   Pal lerp(ThemeExtension<Pal>? other, double t) => other is Pal ? (t < .5 ? this : other) : this;
 }
 
-bool isDark(BuildContext c, String mode) => mode == 'dark' || (mode == 'auto' && MediaQuery.platformBrightnessOf(c) == Brightness.dark);
+bool isDark(BuildContext c, String mode) => mode == 'dark' || (mode == 'auto' && WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark);
 
 ThemeData buildTheme(Pal p, bool dark) {
   final base = ColorScheme.fromSeed(seedColor: p.pri, brightness: dark ? Brightness.dark : Brightness.light);
