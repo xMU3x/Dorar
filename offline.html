@@ -3,42 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#c9a84c">
+<meta name="theme-color" content="#F5A623">
 <title>وِرد — غير متصل</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
-    font-family:'Cairo',sans-serif;
-    background:#0e1017;color:#dde0f0;
+    font-family:'Tajawal',sans-serif;
+    background:#0c0c0c;color:#efefef;
     min-height:100vh;
     display:flex;align-items:center;justify-content:center;
     text-align:center;padding:20px;
   }
   .wrap{max-width:320px;}
-  .icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#c9a84c,#8b6918);
-    display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;
-    animation:float 3s ease-in-out infinite;box-shadow:0 6px 24px rgba(201,168,76,.3);}
+  .icon{font-size:4rem;display:block;margin-bottom:20px;animation:float 3s ease-in-out infinite;}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-  h1{font-size:1.4rem;font-weight:900;margin-bottom:10px;color:#e8c96a}
-  p{color:#a8abc4;font-size:.9rem;line-height:1.7;margin-bottom:24px;}
+  h1{font-size:1.4rem;font-weight:900;margin-bottom:10px;}
+  p{color:#909090;font-size:.9rem;line-height:1.7;margin-bottom:24px;}
   .btn{
     display:inline-block;
-    background:linear-gradient(135deg,#c9a84c,#a07830);
-    color:#111;padding:14px 28px;border-radius:12px;
-    font-family:'Cairo',sans-serif;font-weight:800;font-size:1rem;
+    background:linear-gradient(135deg,#F5A623,#e8960f);
+    color:#1a0e00;padding:14px 28px;border-radius:12px;
+    font-family:'Tajawal',sans-serif;font-weight:800;font-size:1rem;
     cursor:pointer;border:none;text-decoration:none;
-    box-shadow:0 4px 18px rgba(201,168,76,.3);
+    box-shadow:0 4px 18px rgba(245,166,35,.3);
     transition:all .2s;
   }
   .btn:hover{transform:translateY(-2px);}
   .status{
-    margin-top:20px;font-size:.78rem;color:#5a5f78;
+    margin-top:20px;font-size:.78rem;color:#555;
     display:flex;align-items:center;justify-content:center;gap:6px;
   }
   .dot{
     width:8px;height:8px;border-radius:50%;
-    background:#e05c5c;
+    background:#E74C3C;
     animation:pulse 1.5s ease-in-out infinite;
   }
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -69,12 +70,12 @@
       }
     }
     window.addEventListener('online',()=>{
-      document.getElementById('dot').style.background='#4caf7d';
+      document.getElementById('dot').style.background='#2ECC71';
       document.getElementById('status-text').textContent='عاد الاتصال! جاري الفتح...';
       setTimeout(()=>window.location.href='/',1000);
     });
     window.addEventListener('offline',()=>{
-      document.getElementById('dot').style.background='#e05c5c';
+      document.getElementById('dot').style.background='#E74C3C';
       document.getElementById('status-text').textContent='غير متصل';
     });
   </script>
