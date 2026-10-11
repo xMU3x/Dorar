@@ -28,8 +28,7 @@ class _AzkarPageState extends State<AzkarPage> {
   String q = '';
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(tab: 2,
       builder: (context, _) => FutureBuilder(
         future: data.categories(),
         builder: (context, snap) {
@@ -135,8 +134,7 @@ class _ZikrPageState extends State<ZikrPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) => FutureBuilder(
         future: data.categories(),
         builder: (context, snap) {
@@ -228,8 +226,7 @@ class FavZikrPage extends StatelessWidget {
   const FavZikrPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) => FutureBuilder(
         future: data.categories(),
         builder: (context, snap) {

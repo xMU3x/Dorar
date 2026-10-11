@@ -41,6 +41,31 @@ class Store extends ChangeNotifier {
     }
   }
 
+  final Map<String, (String, dynamic)> _dc = {};
+
+  /// قراءة سريعة للقراءة فقط: تُخزَّن النتيجة المفكوكة في الذاكرة ولا تُنسخ.
+  /// لا تعدّل القيمة المرجعة (استخدم getMap/upd للتعديل).
+  dynamic peek(String k, [dynamic d]) {
+    final raw = _p.getString('$kStorePrefix$k');
+    if (raw == null) return d;
+    final c = _dc[k];
+    if (c != null && (identical(c.$1, raw) || c.$1 == raw)) return c.$2;
+    try {
+      final v = jsonDecode(raw);
+      _dc[k] = (raw, v);
+      return v;
+    } catch (_) {
+      return d;
+    }
+  }
+
+  Map<String, dynamic> peekMap(String k, [Map<String, dynamic>? d]) {
+    final v = peek(k);
+    if (v is Map<String, dynamic>) return v;
+    if (v is Map) return Map<String, dynamic>.from(v);
+    return d ?? const <String, dynamic>{};
+  }
+
   Map<String, dynamic> getMap(String k, [Map<String, dynamic>? d]) {
     final v = get(k);
     if (v is Map) return Map<String, dynamic>.from(v);
@@ -93,7 +118,7 @@ class Cfg {
     'arDigits': false, 'vibrate': true, 'hijriAdj': 0,
   };
   dynamic get(String k) {
-    final s = store.getMap('settings');
+    final s = store.peekMap('settings');
     return s.containsKey(k) ? s[k] : def[k];
   }
 

@@ -71,7 +71,7 @@ const _tmap = {
 };
 const _zmap = {'morning': 'hisn-27', 'evening': 'hisn-27e', 'sleep': 'hisn-28'};
 
-Map<String, dynamic> chalState() => store.getMap('challenges', {'done': {}});
+Map<String, dynamic> chalState() => store.peekMap('challenges', {'done': {}});
 
 Future<int?> _autoVal(Map<String, dynamic> c, String p) async {
   final auto = c['auto'] as String?;
@@ -97,7 +97,7 @@ Future<int?> _autoVal(Map<String, dynamic> c, String p) async {
   return null;
 }
 
-Future<List<ChalItem>> chalPick(String p) async {
+Future<List<Map<String, dynamic>>> chalPick(String p) async {
   final all = (await data.challenges()).where((c) => c['period'] == p).toList();
   return seededPick(all, periodKey(p), p == 'day' ? 5 : p == 'week' ? 3 : 2);
 }
@@ -158,7 +158,7 @@ void chalToggle(String key) => store.upd('challenges', {'done': {}}, (z) {
 List<(String, bool)> achievements(({int n, int pts}) tot, ({int cur, int best}) st) {
   final pr = (quranState()['pagesRead'] as Map?) ?? {};
   final pages = pr.values.fold<int>(0, (a, b) => a + ((b as num?)?.toInt() ?? 0));
-  final tasb = ((tasbihState()['total'] as Map?) ?? {}).values.fold<int>(0, (a, b) => a + ((b as num?)?.toInt() ?? 0));
+  final tasb = ((tasbihPeek()['total'] as Map?) ?? {}).values.fold<int>(0, (a, b) => a + ((b as num?)?.toInt() ?? 0));
   return [
     ('إنجاز ١٠ تحديات', tot.n >= 10), ('إنجاز ٥٠ تحديًا', tot.n >= 50), ('إنجاز ١٠٠ تحدٍّ', tot.n >= 100),
     ('نشاط ٣ أيام متتالية', st.best >= 3), ('نشاط ٧ أيام متتالية', st.best >= 7), ('نشاط ٣٠ يومًا متتالية', st.best >= 30),

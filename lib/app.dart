@@ -20,8 +20,6 @@ import 'pages/tasbih.dart';
 import 'ui/theme.dart';
 import 'ui/widgets.dart';
 
-final ValueNotifier<int> tabIndex = ValueNotifier(0);
-
 /// يفتح صفحة حسب مسارها النصي (يُستخدم من الإشعارات والاختصارات).
 void openRoute(String go) {
   final parts = go.split('/');
@@ -112,7 +110,6 @@ class _WerdAppState extends State<WerdApp> with WidgetsBindingObserver {
   }
 }
 
-/// تبويب واحد فقط يُبنى في كل مرة (أخف بكثير من بناء كل التبويبات وإبقائها حيّة).
 Widget _tabPage(int i) => switch (i) {
       0 => const HomePage(),
       1 => const RecitersPage(),
@@ -120,6 +117,65 @@ Widget _tabPage(int i) => switch (i) {
       3 => const FastingPage(),
       _ => const MorePage(),
     };
+
+/// يبني كل تبويب مرة واحدة فقط (عند أول زيارة أو في الخلفية بعد الإقلاع) ويُبقيه حيًّا،
+/// فيصبح التنقّل بين التبويبات فوريًا بدل إعادة البناء كل مرة، مع تلاشٍ سريع للتبويب الجديد.
+class _TabHost extends StatefulWidget {
+  const _TabHost();
+  @override
+  State<_TabHost> createState() => _TabHostState();
+}
+
+class _TabHostState extends State<_TabHost> with SingleTickerProviderStateMixin {
+  final Set<int> _built = {0};
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 180), value: 1);
+  late final Animation<double> _fade = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+  int _idx = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    tabIndex.addListener(_onTab);
+    // تدفئة التبويبات تدريجيًا بعد الإقلاع (واحد كل ثانية تقريبًا) حتى لا يظهر تأخير عند أول زيارة
+    for (var i = 1; i < 5; i++) {
+      Future.delayed(Duration(milliseconds: 700 + i * 700), () {
+        if (mounted && !_built.contains(i)) setState(() => _built.add(i));
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    tabIndex.removeListener(_onTab);
+    _c.dispose();
+    super.dispose();
+  }
+
+  void _onTab() {
+    final i = tabIndex.value;
+    if (i == _idx) return;
+    setState(() {
+      _idx = i;
+      _built.add(i);
+    });
+    _c.forward(from: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexedStack(
+      index: _idx,
+      sizing: StackFit.expand,
+      children: [
+        for (var i = 0; i < 5; i++)
+          if (_built.contains(i))
+            RepaintBoundary(child: FadeTransition(opacity: i == _idx ? _fade : const AlwaysStoppedAnimation<double>(1), child: _tabPage(i)))
+          else
+            const SizedBox.shrink(),
+      ],
+    );
+  }
+}
 
 class NavShell extends StatelessWidget {
   const NavShell({super.key});
@@ -137,28 +193,38 @@ class NavShell extends StatelessWidget {
     final bottom = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       extendBody: true,
-      body: ValueListenableBuilder<int>(
-        valueListenable: tabIndex,
-        builder: (_, i, __) => AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: KeyedSubtree(key: ValueKey(i), child: _tabPage(i)),
-        ),
-      ),
+      body: const _TabHost(),
       bottomNavigationBar: Column(mainAxisSize: MainAxisSize.min, children: [
         ListenableBuilder(listenable: player, builder: (_, __) => player.cur == null ? const SizedBox.shrink() : const MiniPlayer()),
-        Container(
-          padding: EdgeInsets.fromLTRB(10, 8, 10, 8 + bottom),
-          decoration: BoxDecoration(color: p.surf.withValues(alpha: .97), border: Border(top: BorderSide(color: p.line))),
-          child: ValueListenableBuilder<int>(
-            valueListenable: tabIndex,
-            builder: (_, sel, __) => Row(children: [
-              for (var i = 0; i < _tabs.length; i++)
-                Expanded(child: _NavItem(icon: _tabs[i].$1, label: _tabs[i].$2, selected: sel == i, onTap: () {
-                  if (sel != i) hap.tick();
-                  tabIndex.value = i;
-                  navKey.currentState?.popUntil((r) => r.isFirst);
-                })),
-            ]),
+        RepaintBoundary(
+          child: Container(
+            padding: EdgeInsets.only(bottom: bottom),
+            decoration: BoxDecoration(
+              color: p.surf,
+              border: Border(top: BorderSide(color: p.line)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .05), blurRadius: 8, offset: const Offset(0, -1))],
+            ),
+            child: SizedBox(
+              height: 68,
+              child: ValueListenableBuilder<int>(
+                valueListenable: tabIndex,
+                builder: (_, sel, __) => Row(children: [
+                  for (var i = 0; i < _tabs.length; i++)
+                    Expanded(
+                      child: _NavItem(
+                        icon: _tabs[i].$1,
+                        label: _tabs[i].$2,
+                        selected: sel == i,
+                        onTap: () {
+                          if (sel != i) hap.tick();
+                          tabIndex.value = i;
+                          navKey.currentState?.popUntil((r) => r.isFirst);
+                        },
+                      ),
+                    ),
+                ]),
+              ),
+            ),
           ),
         ),
       ]),
@@ -166,33 +232,53 @@ class NavShell extends StatelessWidget {
   }
 }
 
-/// أيقونات فقط افتراضيًا، وعند الاختيار تظهر الأيقونة مع اسمها أسفلها.
-class _NavItem extends StatelessWidget {
+/// أيقونات فقط افتراضيًا؛ عند الاختيار يتوسّع الإطار وتظهر التسمية أسفل الأيقونة.
+/// المساحة محجوزة ثابتة (لا تغيّر في التخطيط) والحركة بالألوان والشفافية فقط → سلسة بلا قفزات.
+class _NavItem extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
   const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
   @override
+  State<_NavItem> createState() => _NavItemState();
+}
+
+class _NavItemState extends State<_NavItem> {
+  bool _down = false;
+  @override
   Widget build(BuildContext context) {
     final p = Pal.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(22),
-      onTap: onTap,
-      child: AnimatedSize(
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.symmetric(horizontal: selected ? 22 : 10, vertical: 5),
-              decoration: BoxDecoration(color: selected ? p.pc : Colors.transparent, borderRadius: BorderRadius.circular(18)),
-              child: Icon(icon, size: 26, color: selected ? p.pri : p.on2),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => setState(() => _down = true),
+      onTapCancel: () => setState(() => _down = false),
+      onTapUp: (_) => setState(() => _down = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _down ? .9 : 1,
+        duration: const Duration(milliseconds: 90),
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(end: widget.selected ? 1 : 0),
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          builder: (_, t, __) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Container(
+              width: 44 + 28 * t,
+              height: 32,
+              decoration: BoxDecoration(color: Color.lerp(Colors.transparent, p.pc, t), borderRadius: BorderRadius.circular(16)),
+              child: Icon(widget.icon, size: 24, color: Color.lerp(p.on2, p.pri, t)),
             ),
-            if (selected) Padding(padding: const EdgeInsets.only(top: 2), child: Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: p.pri))),
+            SizedBox(
+              height: 18,
+              child: Opacity(
+                opacity: t,
+                child: Transform.translate(
+                  offset: Offset(0, (1 - t) * 5),
+                  child: Text(widget.label, maxLines: 1, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: p.pri)),
+                ),
+              ),
+            ),
           ]),
         ),
       ),

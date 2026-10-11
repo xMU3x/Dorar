@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../app.dart';
 import '../core/store.dart';
+import '../core/util.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
 
@@ -78,8 +79,7 @@ class _MorePageState extends State<MorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(tab: 4,
       builder: (context, _) {
         final p = Pal.of(context);
         final m = _ms();

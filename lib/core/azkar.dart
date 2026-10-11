@@ -2,7 +2,7 @@ import 'data.dart';
 import 'store.dart';
 import 'util.dart';
 
-Map<String, dynamic> azkarState() => store.getMap('azkar', {'fav': [], 'c': {}});
+Map<String, dynamic> azkarState() => store.peekMap('azkar', {'fav': [], 'c': {}});
 
 int zikrCount(String cat, int zid, [String? date]) {
   final c = (azkarState()['c'] as Map?) ?? {};

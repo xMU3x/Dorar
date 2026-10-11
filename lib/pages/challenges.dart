@@ -23,8 +23,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) => FutureBuilder(
         future: chalStateFor(tab),
         builder: (context, snap) {
@@ -32,7 +31,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
           final S = snap.data ?? [];
           final done = S.where((x) => x.ok).length;
           final st = streak(), tot = chalTotal(), lvl = tot.pts ~/ 100 + 1, pn = 100 - tot.pts % 100;
-          final act = ((store.getMap('activity', {'days': {}})['days']) as Map?) ?? {};
+          final act = ((store.peekMap('activity', {'days': {}})['days']) as Map?) ?? {};
           final ws = weekStart(DateTime.now());
           final nextIdx = S.indexWhere((x) => !x.ok);
           const wd = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];

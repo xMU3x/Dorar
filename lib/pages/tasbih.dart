@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/challenges.dart';
@@ -20,68 +21,91 @@ class TasbihPage extends StatefulWidget {
 }
 
 class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 160), lowerBound: 0, upperBound: 1);
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 140));
+  // الحالة تعيش في الذاكرة أثناء العدّ (بدون قراءة/كتابة تخزين عند كل لمسة) وتُحفظ بتأخير قصير
+  late Map<String, dynamic> t = tasbihState();
+  Timer? _saveT;
   bool pressed = false;
-  int _lastSave = 0;
 
   @override
   void dispose() {
+    _saveT?.cancel();
+    final snapshot = t;
+    Future.microtask(() {
+      store.set('tasbih', snapshot);
+      chalCheck();
+    });
     _pulse.dispose();
-    final snapshot = tasbihState();
-    Future.microtask(() => store.set('tasbih', snapshot));
     super.dispose();
   }
 
+  void _scheduleSave() {
+    _saveT?.cancel();
+    _saveT = Timer(const Duration(milliseconds: 900), () => store.set('tasbih', t, quiet: true));
+  }
+
+  void _commit() {
+    _saveT?.cancel();
+    store.set('tasbih', t);
+  }
+
   Map<String, dynamic> get item {
-    final t = tasbihState();
     final items = (t['items'] as List).cast<Map>();
     return Map<String, dynamic>.from(items.firstWhere((x) => x['id'] == t['cur'], orElse: () => items.first));
+  }
+
+  int _n(String id) => (((t['n'] as Map)[id]) as num?)?.toInt() ?? 0;
+
+  int _daySum() {
+    final d = ((t['day'] as Map?)?[todayKey()] as Map?) ?? {};
+    return d.values.fold<int>(0, (a, b) => a + ((b as num?)?.toInt() ?? 0));
   }
 
   void tap() {
     final it = item;
     final goal = (it['goal'] as num).toInt();
-    final done = tasbihTap(it['id'] as String, goal);
+    final done = tasbihTapIn(t, it['id'] as String, goal);
     _pulse.forward(from: 0).then((_) => _pulse.reverse());
     touchActivity();
-    final n = (((tasbihState()['n'] as Map)[it['id']]) as num?)?.toInt() ?? 0;
+    final n = _n(it['id'] as String);
     if (done) {
       hap.success();
       if (cfg.get('tsound') == true) SystemSound.play(SystemSoundType.alert);
       toast('أتممت الجولة، تقبّل الله منك');
-      store.set('tasbih', tasbihState());
+      _commit();
       chalCheck();
     } else {
       (n % 33 == 0 || n % 10 == 0) ? hap.heavy() : hap.click();
       if (cfg.get('tsound') == true) SystemSound.play(SystemSoundType.click);
-      final now = DateTime.now().millisecondsSinceEpoch;
-      if (n % 10 == 0 || now - _lastSave > 1200) {
-        store.set('tasbih', tasbihState());
-        _lastSave = now;
-      }
+      _scheduleSave();
     }
     setState(() {});
   }
 
+  void _mutate(void Function(Map<String, dynamic>) fn) {
+    fn(t);
+    _commit();
+    setState(() {});
+  }
+
   Future<void> addCustom() async {
-    final t = TextEditingController(), g = TextEditingController(text: '33');
+    final tx = TextEditingController(), g = TextEditingController(text: '33');
     final ok = await showAppSheet<bool>(context, (ctx) => Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('إضافة ذكر مخصص', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
-          TextField(controller: t, decoration: const InputDecoration(hintText: 'نص الذكر')),
+          TextField(controller: tx, decoration: const InputDecoration(hintText: 'نص الذكر')),
           const SizedBox(height: 10),
           TextField(controller: g, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'الهدف')),
           const SizedBox(height: 14),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('إضافة')),
         ]));
     if (ok != true) return;
-    if (t.text.trim().isEmpty) { toast('اكتب شيئًا أولًا.'); return; }
+    if (tx.text.trim().isEmpty) { toast('اكتب شيئًا أولًا.'); return; }
     final id = 'c${DateTime.now().millisecondsSinceEpoch}';
-    tasbihUpdate((s) {
-      (s['items'] as List).add({'id': id, 'text': t.text.trim(), 'goal': int.tryParse(g.text) ?? 33, 'custom': true});
+    _mutate((s) {
+      (s['items'] as List).add({'id': id, 'text': tx.text.trim(), 'goal': int.tryParse(g.text) ?? 33, 'custom': true});
       s['cur'] = id;
     });
-    setState(() {});
   }
 
   Future<void> setGoal() async {
@@ -98,23 +122,21 @@ class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateM
         ])));
     if (ok != true) return;
     final v = (int.tryParse(c.text) ?? 33).clamp(1, 100000);
-    tasbihUpdate((s) {
+    _mutate((s) {
       final m = (s['items'] as List).cast<Map>().firstWhere((x) => x['id'] == it['id']);
       m['goal'] = v;
       final n = (s['n'] as Map);
       final cur = (n[it['id']] as num?)?.toInt() ?? 0;
       n[it['id']] = cur > v - 1 ? v - 1 : cur;
     });
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final p = Pal.of(context);
-    final t = tasbihState();
     final it = item;
     final goal = (it['goal'] as num).toInt();
-    final n = (((t['n'] as Map)[it['id']]) as num?)?.toInt() ?? 0;
+    final n = _n(it['id'] as String);
     final mq = MediaQuery.of(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -126,7 +148,7 @@ class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateM
               RoundIconButton(Icons.arrow_forward_rounded, () => Navigator.of(context).maybePop()),
               const SizedBox(width: 8),
               const Expanded(child: Text('التسبيح', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700))),
-              Text('اليوم · ${nf(tasbihDaySum('all'))}', style: TextStyle(color: p.gold, fontWeight: FontWeight.w700)),
+              Text('اليوم · ${nf(_daySum())}', style: TextStyle(color: p.gold, fontWeight: FontWeight.w700)),
             ]),
             const SizedBox(height: 12),
             SizedBox(
@@ -138,18 +160,17 @@ class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateM
                     child: GestureDetector(
                       onLongPress: x['custom'] == true ? () async {
                         if (await confirmDialog(context, 'حذف الذكر المخصص؟', x['text'] as String, ok: 'حذف', danger: true)) {
-                          tasbihUpdate((s) {
+                          _mutate((s) {
                             s['items'] = (s['items'] as List).where((e) => (e as Map)['id'] != x['id']).toList();
                             if (s['cur'] == x['id']) s['cur'] = ((s['items'] as List).first as Map)['id'];
                           });
-                          setState(() {});
                         }
                       } : null,
                       child: ChoiceChip(
                         label: Text(_short(x['text'] as String)),
                         selected: x['id'] == it['id'], showCheckmark: false, selectedColor: p.pri, backgroundColor: p.surf,
                         labelStyle: TextStyle(color: x['id'] == it['id'] ? p.onpri : p.on), shape: const StadiumBorder(), side: BorderSide(color: p.line),
-                        onSelected: (_) { hap.select(); tasbihUpdate((s) => s['cur'] = x['id']); setState(() {}); },
+                        onSelected: (_) { hap.select(); _mutate((s) => s['cur'] = x['id']); },
                       ),
                     ),
                   ),
@@ -170,7 +191,7 @@ class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateM
                     builder: (_, __) => Transform.scale(
                       scale: 1 + _pulse.value * .04 - (pressed ? .03 : 0),
                       child: Ring(
-                        v: n / goal, size: 270, stroke: 12, color: p.gold, track: p.surf2,
+                        v: n / goal, size: 270, stroke: 12, color: p.gold, track: p.surf2, duration: const Duration(milliseconds: 140),
                         child: Column(mainAxisSize: MainAxisSize.min, children: [
                           Text(nf(n), style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700, color: p.pri)),
                           Text('من ${nf(goal)}', style: TextStyle(color: p.on2)),
@@ -188,9 +209,8 @@ class _TasbihPageState extends State<TasbihPage> with SingleTickerProviderStateM
               TextButton.icon(
                 onPressed: () async {
                   if (await confirmDialog(context, 'إعادة تعيين العداد؟', 'سيُصفَّر عدّ هذا الذكر', ok: 'إعادة', danger: true)) {
-                    tasbihUpdate((s) => (s['n'] as Map)[it['id']] = 0);
+                    _mutate((s) => (s['n'] as Map)[it['id']] = 0);
                     hap.heavy();
-                    setState(() {});
                   }
                 },
                 icon: const Icon(Icons.refresh_rounded), label: const Text('إعادة العدّ'),

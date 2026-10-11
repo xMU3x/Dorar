@@ -9,8 +9,7 @@ class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) {
         final adj = ((cfg.get('hijriAdj') as num?) ?? 0).toInt();
         Widget sw(String k, String t, String s) => SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(t, style: const TextStyle(fontWeight: FontWeight.w700)), subtitle: Sub(s), value: cfg.get(k) == true, onChanged: (v) { hap.tick(); cfg.set(k, v); });

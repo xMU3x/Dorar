@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/fasting.dart';
 import '../core/hijri_util.dart';
-import '../core/store.dart';
 import '../core/util.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
@@ -70,8 +69,7 @@ class _FastingPageState extends State<FastingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(tab: widget.openAdd ? null : 3,
       builder: (context, _) {
         final p = Pal.of(context);
         final F = fastState();

@@ -7,7 +7,6 @@ import '../core/fasting.dart';
 import '../core/hijri_util.dart';
 import '../core/khatma.dart';
 import '../core/notify.dart';
-import '../core/store.dart';
 import '../core/util.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
@@ -36,8 +35,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(tab: 0,
       builder: (context, _) {
         final p = Pal.of(context);
         final kh = khatma(), pg = pagesToday(), st = streak();

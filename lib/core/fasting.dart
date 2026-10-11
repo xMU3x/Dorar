@@ -31,7 +31,7 @@ class FastState {
 }
 
 FastState fastState() {
-  final f = store.getMap('fast');
+  final f = store.peekMap('fast');
   return FastState(
     {...ruleDefaults, ...Map<String, dynamic>.from((f['rules'] as Map?) ?? {})},
     [for (final c in (f['custom'] as List?) ?? []) Map<String, dynamic>.from(c as Map)],
@@ -106,8 +106,13 @@ class Season {
   Season(this.k, this.name, this.st, this.en, this.d1, this.d2);
 }
 
+String? _seasonsKey;
+List<Season> _seasonsCache = const [];
+
 List<Season> seasons() {
   final today = noon(DateTime.now());
+  final ck = '${dkey(today)}|${cfg.get('hijriAdj')}';
+  if (_seasonsKey == ck) return _seasonsCache;
   final h = hj(today);
   final out = <Season>[];
   const S = [
@@ -139,5 +144,6 @@ List<Season> seasons() {
     }
   }
   out.sort((a, b) => a.st.compareTo(b.st));
-  return out.take(6).toList();
+  _seasonsKey = ck;
+  return _seasonsCache = out.take(6).toList();
 }

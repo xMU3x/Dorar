@@ -21,6 +21,11 @@ Map<String, dynamic> tasbihState() {
   return v is Map ? Map<String, dynamic>.from(v) : tasbihDefault();
 }
 
+Map<String, dynamic> tasbihPeek() {
+  final v = store.peek('tasbih');
+  return v is Map<String, dynamic> ? v : tasbihDefault();
+}
+
 void tasbihUpdate(void Function(Map<String, dynamic>) fn, {bool quiet = false}) {
   final t = tasbihState();
   fn(t);
@@ -30,29 +35,32 @@ void tasbihUpdate(void Function(Map<String, dynamic>) fn, {bool quiet = false}) 
 int _i(dynamic v) => (v as num?)?.toInt() ?? 0;
 
 int tasbihDaySum(dynamic ids, [String? date]) {
-  final d = ((tasbihState()['day'] as Map?)?[date ?? todayKey()] as Map?) ?? {};
+  final d = ((tasbihPeek()['day'] as Map?)?[date ?? todayKey()] as Map?) ?? {};
   if (ids == 'all') return d.values.fold<int>(0, (a, b) => a + _i(b));
   return (ids as List).fold<int>(0, (a, k) => a + _i(d[k]));
 }
 
-/// ينفّذ لمسة واحدة على العدّاد. يرجع true إذا اكتملت الجولة.
+/// لمسة واحدة على حالة موجودة في الذاكرة (بدون قراءة/كتابة تخزين). يرجع true عند اكتمال الجولة.
+bool tasbihTapIn(Map<String, dynamic> t, String id, int goal) {
+  final n = t['n'] as Map, total = t['total'] as Map, rounds = t['rounds'] as Map;
+  final day = t['day'] as Map;
+  final nn = _i(n[id]) + 1;
+  total[id] = _i(total[id]) + 1;
+  day[todayKey()] ??= <String, dynamic>{};
+  final dd = day[todayKey()] as Map;
+  dd[id] = _i(dd[id]) + 1;
+  if (nn >= goal) {
+    n[id] = 0;
+    rounds[id] = _i(rounds[id]) + 1;
+    return true;
+  }
+  n[id] = nn;
+  return false;
+}
+
+/// ينفّذ لمسة واحدة ويحفظها. يرجع true إذا اكتملت الجولة.
 bool tasbihTap(String id, int goal) {
   var done = false;
-  tasbihUpdate((t) {
-    final n = t['n'] as Map, total = t['total'] as Map, rounds = t['rounds'] as Map;
-    final day = t['day'] as Map;
-    final nn = _i(n[id]) + 1;
-    total[id] = _i(total[id]) + 1;
-    day[todayKey()] ??= <String, dynamic>{};
-    final dd = day[todayKey()] as Map;
-    dd[id] = _i(dd[id]) + 1;
-    if (nn >= goal) {
-      n[id] = 0;
-      rounds[id] = _i(rounds[id]) + 1;
-      done = true;
-    } else {
-      n[id] = nn;
-    }
-  }, quiet: true);
+  tasbihUpdate((t) => done = tasbihTapIn(t, id, goal), quiet: true);
   return done;
 }

@@ -1,8 +1,59 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/store.dart';
 import '../core/util.dart';
 import 'theme.dart';
+
+/// التبويب الحالي في الشريط السفلي.
+final ValueNotifier<int> tabIndex = ValueNotifier(0);
+
+/// يعيد البناء عند تغيّر التخزين. إذا حُدِّد [tab] فلا يعيد البناء وهو مخفي (يوفّر عملًا كبيرًا).
+class StoreBuilder extends StatefulWidget {
+  final int? tab;
+  final Widget Function(BuildContext, Object?) builder;
+  const StoreBuilder({super.key, this.tab, required this.builder});
+  @override
+  State<StoreBuilder> createState() => _StoreBuilderState();
+}
+
+class _StoreBuilderState extends State<StoreBuilder> {
+  bool get _visible => widget.tab == null || tabIndex.value == widget.tab;
+  bool _dirty = false;
+
+  @override
+  void initState() {
+    super.initState();
+    store.addListener(_onStore);
+    if (widget.tab != null) tabIndex.addListener(_onTab);
+  }
+
+  @override
+  void dispose() {
+    store.removeListener(_onStore);
+    tabIndex.removeListener(_onTab);
+    super.dispose();
+  }
+
+  void _onStore() {
+    if (!mounted) return;
+    if (_visible) {
+      setState(() {});
+    } else {
+      _dirty = true;
+    }
+  }
+
+  void _onTab() {
+    if (mounted && _dirty && _visible) {
+      _dirty = false;
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, null);
+}
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> msgKey = GlobalKey<ScaffoldMessengerState>();
@@ -80,7 +131,11 @@ class Backdrop extends StatelessWidget {
     final p = Pal.of(context);
     return ColoredBox(
       color: p.bg,
-      child: CustomPaint(painter: StarsPainter(p.pri.withValues(alpha: .05)), child: child),
+      child: Stack(fit: StackFit.expand, children: [
+        // الزخرفة تُرسم مرة واحدة في RepaintBoundary ولا تتأثر بالتمرير
+        RepaintBoundary(child: CustomPaint(painter: StarsPainter(p.pri.withValues(alpha: .05)))),
+        child,
+      ]),
     );
   }
 }
@@ -133,7 +188,7 @@ class HeroCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
             gradient: LinearGradient(colors: p.hero, begin: Alignment.topRight, end: Alignment.bottomLeft),
-            boxShadow: [BoxShadow(color: p.gold.withValues(alpha: .18), blurRadius: 24, offset: const Offset(0, 8))],
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .10), blurRadius: 10, offset: const Offset(0, 3))],
           ),
           child: InkWell(
             onTap: onTap == null ? null : () { hap.tick(); onTap!(); },
@@ -149,7 +204,8 @@ class Ring extends StatelessWidget {
   final double v, size, stroke;
   final Color? color, track;
   final Widget? child;
-  const Ring({super.key, required this.v, this.size = 72, this.stroke = 8, this.color, this.track, this.child});
+  final Duration duration;
+  const Ring({super.key, required this.v, this.size = 72, this.stroke = 8, this.color, this.track, this.child, this.duration = const Duration(milliseconds: 500)});
   @override
   Widget build(BuildContext context) {
     final p = Pal.of(context);
@@ -158,7 +214,7 @@ class Ring extends StatelessWidget {
       height: size,
       child: TweenAnimationBuilder<double>(
         tween: Tween(end: v.clamp(0, 1).toDouble()),
-        duration: const Duration(milliseconds: 600),
+        duration: duration,
         curve: Curves.easeOutCubic,
         builder: (_, val, __) => CustomPaint(
           painter: _RingPainter(val, stroke, color ?? p.pri, track ?? p.surf2),
@@ -260,7 +316,7 @@ class PageScaffold extends StatelessWidget {
       floatingActionButton: fab,
       body: Backdrop(
         child: ListView(
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          physics: const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           padding: EdgeInsets.fromLTRB(16, mq.padding.top + 8, 16, mq.padding.bottom + 110),
           children: [
             Row(children: [

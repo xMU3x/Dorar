@@ -36,7 +36,8 @@ ThemeData buildTheme(Pal p, bool dark) {
     brightness: dark ? Brightness.dark : Brightness.light,
     colorScheme: base.copyWith(primary: p.pri, onPrimary: p.onpri, surface: p.surf, onSurface: p.on, primaryContainer: p.pc, outlineVariant: p.line),
     scaffoldBackgroundColor: p.bg,
-    splashFactory: InkSparkle.splashFactory,
+    splashFactory: InkRipple.splashFactory,
+    highlightColor: Colors.transparent,
     extensions: [p],
     textTheme: ThemeData(brightness: dark ? Brightness.dark : Brightness.light).textTheme.apply(fontFamily: 'Tajawal', bodyColor: p.on, displayColor: p.on),
     inputDecorationTheme: InputDecorationTheme(

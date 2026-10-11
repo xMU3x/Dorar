@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/notify.dart';
-import '../core/store.dart';
 import '../core/util.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
@@ -88,8 +87,7 @@ class _RemindersPageState extends State<RemindersPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) {
         final p = Pal.of(context);
         final nx = nextReminder();

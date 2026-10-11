@@ -11,8 +11,7 @@ class KhatmaPage extends StatelessWidget {
   const KhatmaPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: store,
+    return StoreBuilder(
       builder: (context, _) {
         final p = Pal.of(context);
         final k = khatma(), pg = pagesToday();

@@ -2,7 +2,7 @@ import 'data.dart';
 import 'store.dart';
 import 'util.dart';
 
-Map<String, dynamic> khatma() => store.getMap('khatma', {'read': 0, 'goal': 5, 'done': 0, 'start': todayKey(), 'last': null});
+Map<String, dynamic> khatma() => store.peekMap('khatma', {'read': 0, 'goal': 5, 'done': 0, 'start': todayKey(), 'last': null});
 
 /// يرجع true إذا أُتمّت ختمة كاملة.
 bool khatmaAdd(int n) {
