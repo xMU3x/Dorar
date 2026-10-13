@@ -36,10 +36,6 @@ class _FastingPageState extends State<FastingPage> {
     setState(() { gm = m; gy = y; });
   }
 
-  Color _kindColor(Pal p, String k) => switch (k) {
-        'fard' => p.pri, 'sunna' => p.gold, 'bid' => p.ok, 'eid' => const Color(0xFFA8332B), 'custom' => const Color(0xFF6A5ACD), 'mt' => p.pri.withValues(alpha: .6), _ => Colors.transparent,
-      };
-
   Future<void> addCustom() async {
     final title = TextEditingController();
     var type = 'once', date = noon(DateTime.now()), wd = <int>{1, 4}, hd = hj().d, hm = hj().m;

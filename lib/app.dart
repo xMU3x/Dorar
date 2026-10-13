@@ -16,7 +16,6 @@ import 'pages/home.dart';
 import 'pages/khatma.dart';
 import 'pages/more.dart';
 import 'ui/player_sheet.dart';
-import 'ui/wicons.dart';
 import 'pages/notif_settings.dart';
 import 'pages/reciters.dart';
 import 'pages/reminders.dart';

@@ -82,7 +82,6 @@ class _MorePageState extends State<MorePage> {
   Widget build(BuildContext context) {
     return StoreBuilder(tab: 4,
       builder: (context, _) {
-        final p = Pal.of(context);
         final m = _ms();
         final hide = ((m['hide'] as List?) ?? []).cast<String>();
         final ord = Map<String, dynamic>.from(m['ord'] as Map);

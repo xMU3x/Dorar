@@ -9,6 +9,7 @@ import '../core/notify.dart';
 import '../core/util.dart';
 import '../ui/theme.dart';
 import '../ui/widgets.dart';
+import '../core/data.dart';
 import '../core/mawaiz.dart';
 import 'account.dart';
 import 'tasks.dart';
