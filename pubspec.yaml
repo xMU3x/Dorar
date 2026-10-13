@@ -1,7 +1,7 @@
 name: habittracker
 description: درر — تطبيق Flutter أصلي للأذكار والختمة والتسبيح والصيام والتذكيرات مع مزامنة Supabase.
 publish_to: 'none'
-version: 3.4.0+34
+version: 3.4.2+36
 
 environment:
   sdk: '>=3.6.0 <4.0.0'
@@ -23,7 +23,6 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17
   audio_service: ^0.18.17
   path_provider: ^2.1.4
-  workmanager: ^0.9.0
   http: ^1.2.2
   hijri: ^3.0.0
   share_plus: ^10.1.4

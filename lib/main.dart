@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'app.dart';
-import 'core/background.dart';
 import 'core/notify.dart';
 import 'core/store.dart';
 import 'core/sync.dart';
@@ -35,6 +34,5 @@ Future<void> main() async {
   // الإشعارات بعد أول إطار حتى لا تُبطئ الإقلاع
   WidgetsBinding.instance.addPostFrameCallback((_) {
     notifier.init();
-    registerBackgroundRefresh();
   });
 }
