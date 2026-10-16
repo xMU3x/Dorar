@@ -1,4 +1,4 @@
-package com.werd.habittracker
+package com.dorar.dorar
 
 import com.ryanheise.audioservice.AudioServiceActivity
 

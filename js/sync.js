@@ -1,8 +1,8 @@
 /* تسجيل الدخول (Google / Email) + المزامنة التلقائية عبر Supabase */
 const S = W.sync = { client: null, user: null, status: 'off', last: 0, err: '' };
-const CFG = window.WERD_CONFIG || {};
+const CFG = window.DORAR_CONFIG || {};
 const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
-const REDIRECT = NATIVE ? (CFG.NATIVE_REDIRECT || 'com.werd.habittracker://auth') : location.origin + location.pathname;
+const REDIRECT = NATIVE ? (CFG.NATIVE_REDIRECT || 'com.dorar.dorar://auth') : location.origin + location.pathname;
 const lsj = (k, d) => { try { return JSON.parse(localStorage.getItem('werd2:' + k)) || d } catch { return d } };
 const lss = (k, v) => localStorage.setItem('werd2:' + k, JSON.stringify(v));
 const setStatus = (s, e = '') => { S.status = s; S.err = e; W.emit('sync', s); };

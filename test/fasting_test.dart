@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/core/fasting.dart';
-import 'package:habittracker/core/hijri_util.dart';
-import 'package:habittracker/core/store.dart';
+import 'package:dorar/core/fasting.dart';
+import 'package:dorar/core/hijri_util.dart';
+import 'package:dorar/core/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

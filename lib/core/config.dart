@@ -5,7 +5,7 @@ const String kSupabaseUrl = String.fromEnvironment(
   defaultValue: 'https://mckhvbkzcanjtjqiqqyd.supabase.co',
 );
 const String kSupabaseKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-const String kNativeRedirect = 'com.werd.habittracker://auth';
+const String kNativeRedirect = 'com.dorar.dorar://auth';
 const String kStorePrefix = 'werd2:';
 const List<String> kSyncKeys = [
   'khatma', 'tasbih', 'azkar', 'quran', 'challenges',

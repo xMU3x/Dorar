@@ -12,7 +12,7 @@
   },
   "plugins": {
     "LocalNotifications": {
-      "smallIcon": "ic_stat_werd",
+      "smallIcon": "ic_stat_dorar",
       "iconColor": "#2F6B52"
     }
   }

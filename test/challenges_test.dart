@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/core/challenges.dart';
+import 'package:dorar/core/challenges.dart';
 
 void main() {
   test('بداية الأسبوع السبت', () {

@@ -3,7 +3,7 @@
   W.applyTheme(); W.initNative();
   $$('nav button').forEach(b => b.onclick = () => W.go(b.dataset.t));
   try { await W.sync.init() } catch (e) { console.warn(e) }
-  if (!location.hash && !localStorage.getItem('werd2:__seen') && !W.sync.user && window.WERD_CONFIG?.SUPABASE_URL) location.hash = '#/login'; /* أول تشغيل: صفحة الدخول (يمكن تخطيها) */
+  if (!location.hash && !localStorage.getItem('werd2:__seen') && !W.sync.user && window.DORAR_CONFIG?.SUPABASE_URL) location.hash = '#/login'; /* أول تشغيل: صفحة الدخول (يمكن تخطيها) */
   await W.route();
   W.chal.check().catch(() => { });
   W.notify.init().catch(e => console.warn(e));
