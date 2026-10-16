@@ -86,6 +86,7 @@ jobs:
           flutter build apk --release \
             --build-name=3.4.4 \
             --build-number=$(( VERSION_CODE_BASE + GITHUB_RUN_NUMBER )) \
+            --dart-define=SUPABASE_URL=https://advzmtczixsjryvkfgiu.supabase.co \
             --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
 
       - name: Sign release APK
