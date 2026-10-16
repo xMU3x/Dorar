@@ -58,13 +58,13 @@ void openRoute(String go) {
   }
 }
 
-class WerdApp extends StatefulWidget {
-  const WerdApp({super.key});
+class DorarApp extends StatefulWidget {
+  const DorarApp({super.key});
   @override
-  State<WerdApp> createState() => _WerdAppState();
+  State<DorarApp> createState() => _DorarAppState();
 }
 
-class _WerdAppState extends State<WerdApp> with WidgetsBindingObserver {
+class _DorarAppState extends State<DorarApp> with WidgetsBindingObserver {
   late final Stream<String> _settings = store.changes.where((k) => k == 'settings').asBroadcastStream();
 
   StreamSubscription<bool>? _clickSub;

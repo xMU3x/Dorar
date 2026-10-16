@@ -1,6 +1,9 @@
-name: Build Habittly Android APK
+name: Build Dorar Android APK
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
   push:
     branches:
@@ -81,8 +84,9 @@ jobs:
       - name: Build release APK
         run: |
           flutter build apk --release \
-            --build-name=3.1.0 \
+            --build-name=3.4.4 \
             --build-number=$(( VERSION_CODE_BASE + GITHUB_RUN_NUMBER )) \
+            --dart-define=SUPABASE_URL=https://advzmtczixsjryvkfgiu.supabase.co \
             --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
 
       - name: Sign release APK
@@ -102,23 +106,23 @@ jobs:
             echo "التوقيع بمفتاح المستودع"
           else
             echo "::warning::لا يوجد Keystore في الأسرار — توقيع بمفتاح مؤقت"
-            keytool -genkeypair -keystore release.jks -alias werd -keyalg RSA -keysize 2048 \
-              -validity 10000 -storepass android -keypass android -dname "CN=Werd,O=Werd,C=EG"
-            KS_PASS=android; ALIAS=werd; K_PASS=android
+            keytool -genkeypair -keystore release.jks -alias dorar -keyalg RSA -keysize 2048 \
+              -validity 10000 -storepass android -keypass android -dname "CN=Dorar,O=Dorar,C=EG"
+            KS_PASS=android; ALIAS=dorar; K_PASS=android
           fi
           "$BT/zipalign" -f -p 4 "$SRC" aligned.apk
           "$BT/apksigner" sign --ks release.jks --ks-key-alias "$ALIAS" \
             --ks-pass "pass:$KS_PASS" --key-pass "pass:$K_PASS" \
-            --out dist/habittly-release.apk aligned.apk
-          "$BT/apksigner" verify dist/habittly-release.apk
+            --out dist/Dorar.apk aligned.apk
+          "$BT/apksigner" verify dist/Dorar.apk
           rm -f release.jks aligned.apk
           ls -la dist
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: habittly-release-apk
-          path: dist/habittly-release.apk
+          name: Dorar-apk
+          path: dist/Dorar.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -127,6 +131,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view latest >/dev/null 2>&1 || gh release create latest --title "Habittly (latest build)" --notes "أحدث بناء تلقائي من فرع main" --prerelease
-          gh release upload latest dist/habittly-release.apk --clobber
-          echo "https://github.com/${{ github.repository }}/releases/download/latest/habittly-release.apk" >> "$GITHUB_STEP_SUMMARY"
+          gh release view latest >/dev/null 2>&1 || gh release create latest --title "Dorar (latest build)" --notes "أحدث بناء تلقائي من فرع main" --prerelease
+          gh release upload latest dist/Dorar.apk --clobber
+          echo "https://github.com/${{ github.repository }}/releases/download/latest/Dorar.apk" >> "$GITHUB_STEP_SUMMARY"

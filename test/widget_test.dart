@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/ui/theme.dart';
-import 'package:habittracker/ui/widgets.dart';
+import 'package:dorar/ui/theme.dart';
+import 'package:dorar/ui/widgets.dart';
 
 void main() {
   testWidgets('عناصر الواجهة الأساسية تُرسم في وضع RTL', (tester) async {

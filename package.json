@@ -1,5 +1,5 @@
 {
-  "name": "werd-app",
+  "name": "dorar-app",
   "version": "3.0.0",
   "private": true,
   "description": "دُرَر — الأذكار والتذكيرات والصيام (PWA + Android عبر Capacitor)",

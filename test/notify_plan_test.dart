@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/core/notify_plan.dart';
+import 'package:dorar/core/notify_plan.dart';
 
 void main() {
   durarExtraTests();

@@ -7,8 +7,8 @@
   `khatma, tasbih, azkar, quran, challenges, activity, settings, reminders, fast, more`.
 - نفس منطق `js/sync.js`: سحب ← دمج عند التعارض (أكبر رقم / اتحاد المصفوفات) ← رفع upsert. لا حذف ولا إعادة إنشاء.
 - تسجيل الدخول: Google (PKCE) + بريد/كلمة مرور، حذف الحساب عبر `rpc('delete_my_account')`.
-- رابط العودة: `com.werd.habittracker://auth` (مسجّل مسبقًا في Supabase).
-- هوية التطبيق: `com.werd.habittracker` (نفس تطبيق Capacitor السابق).
+- رابط العودة: `com.dorar.dorar://auth` (مسجّل مسبقًا في Supabase).
+- هوية التطبيق: `com.dorar.dorar` (نفس تطبيق Capacitor السابق).
 
 ## البناء
 المجلد `android/` يُولَّد بأداة Flutter المثبّتة (لتوافق Gradle/AGP/Kotlin) ثم تُطبَّق إعدادات التطبيق:

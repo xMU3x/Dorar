@@ -97,7 +97,7 @@ N.schedule = async () => {
       if (st.perm !== 'granted') { N.scheduled = 0; return }
       let ok = 0;
       for (const part of chunk(items, 40)) {
-        const mk = x => ({ id: x.id, title: x.title, body: x.body, channelId: NCH, smallIcon: 'ic_stat_werd', iconColor: '#2F6B52', extra: x.extra, schedule: x.at ? { at: x.at, allowWhileIdle: true } : { on: x.on, allowWhileIdle: true } });
+        const mk = x => ({ id: x.id, title: x.title, body: x.body, channelId: NCH, smallIcon: 'ic_stat_dorar', iconColor: '#2F6B52', extra: x.extra, schedule: x.at ? { at: x.at, allowWhileIdle: true } : { on: x.on, allowWhileIdle: true } });
         try { await l.schedule({ notifications: part.map(mk) }); ok += part.length } catch (e) { console.warn('LN schedule', e); for (const one of part) { try { await l.schedule({ notifications: [mk(one)] }); ok++ } catch { } } }
       }
       N.scheduled = ok;
@@ -111,7 +111,7 @@ N.schedule = async () => {
 N.test = async () => {
   if (!(await N.perm())) { W.toast('الإشعارات غير مسموحة. فعّلها من إعدادات النظام.'); return false }
   const l = LN();
-  if (l) { await N.channels(); try { await l.schedule({ notifications: [{ id: 1, title: 'دُرَر', body: 'التذكيرات تعمل بنجاح ✓', channelId: NCH, smallIcon: 'ic_stat_werd', schedule: { at: new Date(Date.now() + 1500), allowWhileIdle: true } }] }); return true } catch (e) { W.toast('تعذّر إرسال الإشعار: ' + (e?.message || e)); return false } }
+  if (l) { await N.channels(); try { await l.schedule({ notifications: [{ id: 1, title: 'دُرَر', body: 'التذكيرات تعمل بنجاح ✓', channelId: NCH, smallIcon: 'ic_stat_dorar', schedule: { at: new Date(Date.now() + 1500), allowWhileIdle: true } }] }); return true } catch (e) { W.toast('تعذّر إرسال الإشعار: ' + (e?.message || e)); return false } }
   new Notification('دُرَر', { body: 'التذكيرات تعمل بنجاح', icon: 'icons/icon-192.png' }); return true;
 };
 W.on('change', k => { if (k === 'reminders' || k === 'fast') { clearTimeout(N._t); N._t = setTimeout(N.schedule, 1200) } });

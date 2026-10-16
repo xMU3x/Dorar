@@ -13,7 +13,7 @@ Future<void> main() async {
   // خدمة تشغيل الصوت في الخلفية + إشعار التحكم (تعمل فقط أثناء التشغيل)
   try {
     await JustAudioBackground.init(
-      androidNotificationChannelId: 'com.werd.habittracker.audio',
+      androidNotificationChannelId: 'com.dorar.dorar.audio',
       androidNotificationChannelName: 'تشغيل القرآن',
       androidNotificationChannelDescription: 'التحكم في تشغيل القرآن من شريط الإشعارات',
       androidNotificationOngoing: true,
@@ -30,7 +30,7 @@ Future<void> main() async {
     debugPrint('sync init: $e');
   }
   notifier.onOpen = openRoute;
-  runApp(const WerdApp());
+  runApp(const DorarApp());
   // الإشعارات بعد أول إطار حتى لا تُبطئ الإقلاع
   WidgetsBinding.instance.addPostFrameCallback((_) {
     notifier.init();

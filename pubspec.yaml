@@ -1,4 +1,4 @@
-name: habittracker
+name: dorar
 description: دُرَر — تطبيق Flutter أصلي للأذكار والختمة والتسبيح والصيام والتذكيرات مع مزامنة Supabase.
 publish_to: 'none'
 version: 3.4.4+38

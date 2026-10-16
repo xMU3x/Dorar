@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/core/store.dart';
-import 'package:habittracker/core/tasbih.dart';
-import 'package:habittracker/core/khatma.dart';
+import 'package:dorar/core/store.dart';
+import 'package:dorar/core/tasbih.dart';
+import 'package:dorar/core/khatma.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

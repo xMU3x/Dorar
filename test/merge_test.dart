@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habittracker/core/merge.dart';
+import 'package:dorar/core/merge.dart';
 
 void main() {
   test('الأرقام: أكبر قيمة', () => expect(mergeValues(5, 9), 9));
