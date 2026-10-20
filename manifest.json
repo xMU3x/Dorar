@@ -1,16 +1,19 @@
 {
-  "name": "وِرد",
-  "short_name": "وِرد",
-  "description": "متابعة العادات اليومية — القرآن، الصلاة، الصيام، والمحاضرات",
-  "start_url": "/",
+  "name": "Dorar — القرآن والأذكار",
+  "short_name": "Dorar",
+  "description": "الأذكار والتذكيرات والصيام والتقويم الهجري والتسبيح والتحديات في مكان واحد",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0e1017",
-  "theme_color": "#c9a84c",
+  "background_color": "#F6F0E1",
+  "theme_color": "#0F4A38",
   "orientation": "portrait-primary",
   "lang": "ar",
   "dir": "rtl",
-  "scope": "/",
-  "categories": ["lifestyle", "productivity"],
+  "scope": "./",
+  "categories": [
+    "lifestyle",
+    "education"
+  ],
   "icons": [
     {
       "src": "icons/icon-72.png",
@@ -71,18 +74,34 @@
   ],
   "shortcuts": [
     {
-      "name": "اليوم",
-      "short_name": "اليوم",
-      "description": "فتح متابعة اليوم",
-      "url": "/?tab=today",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+      "name": "الأذكار",
+      "url": "./index.html#/azkar",
+      "icons": [
+        {
+          "src": "icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+     {
+      "name": "التقويم الهجري والصيام",
+      "url": "./index.html#/fasting",
+      "icons": [
+        {
+          "src": "icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "محاضرات",
-      "short_name": "محاضرات",
-      "description": "فتح تتبع المحاضرات",
-      "url": "/?tab=lectures",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+      "name": "التسبيح",
+      "url": "./index.html#/tasbih",
+      "icons": [
+        {
+          "src": "icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
   "prefer_related_applications": false,
