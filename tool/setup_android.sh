@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# يولّد مجلد android بواسطة أداة Flutter الحالية (لتتوافق إعدادات Gradle/AGP/Kotlin مع إصدار Flutter المثبّت)
+# ثم يطبّق إعدادات التطبيق: معرّف الحزمة com.dorar.dorar ،
+# ومانيفست الأذونات ورابط تسجيل الدخول، وإعدادات desugaring.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if [ ! -d android ]; then
+  flutter create --platforms=android --org com.dorar --project-name dorar --no-pub .
+fi
+
+# لا نكتب فوق lib/ أو test/ أو pubspec.yaml (flutter create لا يلمس الموجود منها لكن نتأكد)
+cp android_overlay/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+# أصول Dorar: أيقونة الإشعار + نغمات الصلاة على النبي + MainActivity لخدمة الصوت
+cp -r android_overlay/res/. android/app/src/main/res/
+mkdir -p android/app/src/main/kotlin/com/dorar/dorar
+rm -f android/app/src/main/kotlin/com/dorar/dorar/MainActivity.java
+cp android_overlay/MainActivity.kt android/app/src/main/kotlin/com/dorar/dorar/MainActivity.kt
+python3 tool/patch_gradle.py
+
+# توحيد JVM 17 لكل الوحدات (يُحمَّل تلقائيًا من GRADLE_USER_HOME/init.d)
+GH="${GRADLE_USER_HOME:-$HOME/.gradle}/init.d"
+mkdir -p "$GH"
+cp tool/gradle-jvm17.init.gradle "$GH/dorar-jvm17.gradle"
+echo "installed init script -> $GH/dorar-jvm17.gradle"
+
+APPID=$(grep -R "applicationId" android/app/build.gradle* | head -1 || true)
+echo "$APPID"
+echo "$APPID" | grep -q "com.dorar.dorar" || { echo "معرّف الحزمة غير مطابق (المتوقع com.dorar.dorar)"; exit 1; }
