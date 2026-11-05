@@ -1,0 +1,19 @@
+{
+  "appId": "com.dorar.dorar",
+  "appName": "Dorar",
+  "webDir": "www",
+  "backgroundColor": "#F6F4EC",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#F6F4EC"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_dorar",
+      "iconColor": "#2F6B52"
+    }
+  }
+}
