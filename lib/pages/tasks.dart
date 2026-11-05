@@ -3,6 +3,7 @@ import '../app.dart';
 import '../core/data.dart';
 import '../core/khatma.dart';
 import '../core/reports.dart';
+import '../core/store.dart';
 import '../core/tasks.dart';
 import '../core/util.dart';
 import '../ui/nav.dart';
@@ -143,12 +144,12 @@ class _TasksPageState extends State<TasksPage> {
     if (ok != true) return;
     if (title.text.trim().isEmpty) { toast('اكتب عنوانًا أولًا.'); return; }
     // «يومية» تصنيف خاص: مجموعة daily داخل العبادة
-    final grp = isGroup ? t.group : (c == 'daily' ? 'daily' : (t?.group == 'daily' ? '' : t?.group ?? ''));
+    final grp = isGroup ? t!.group : (c == 'daily' ? 'daily' : (t?.group == 'daily' ? '' : t?.group ?? ''));
     final cc = c == 'daily' ? 'worship' : c;
     if (editing) {
-      customUpdate(t.id, title: title.text.trim(), time: time, cat: cc, imp: imp, rp: r, date: date);
+      customUpdate(t!.id, title: title.text.trim(), time: time, cat: cc, imp: imp, rp: r, date: date);
       store.upd('activity', {'days': {}}, (a) {
-        final m = (a['ct'] as Map?)?[t.id];
+        final m = (a['ct'] as Map?)?[t!.id];
         if (m is Map) m['g'] = grp;
       });
       toast('تم الحفظ');
